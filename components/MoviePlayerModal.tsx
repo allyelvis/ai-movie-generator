@@ -1,16 +1,13 @@
-
 import React, { useEffect } from 'react';
 import type { Movie } from '../types';
 
 interface MoviePlayerModalProps {
   movie: Movie;
+  trailerUrl: string;
   onClose: () => void;
 }
 
-// A cool, tech-themed placeholder video
-const TRAILER_URL = "https://videos.pexels.com/video-files/3209828/3209828-hd_1280_720_25fps.mp4";
-
-export const MoviePlayerModal: React.FC<MoviePlayerModalProps> = ({ movie, onClose }) => {
+export const MoviePlayerModal: React.FC<MoviePlayerModalProps> = ({ movie, trailerUrl, onClose }) => {
   // Close modal on 'Escape' key press
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -53,7 +50,7 @@ export const MoviePlayerModal: React.FC<MoviePlayerModalProps> = ({ movie, onClo
 
         <div className="aspect-video bg-black">
           <video
-            src={TRAILER_URL}
+            src={trailerUrl}
             controls
             autoPlay
             loop

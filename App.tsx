@@ -10,6 +10,9 @@ import { UnlockPremiumModal } from './components/UnlockPremiumModal';
 import type { Movie } from './types';
 import { generateMoviePortfolio } from './services/geminiService';
 
+// A cool, tech-themed placeholder video
+const TRAILER_URL = "https://videos.pexels.com/video-files/3209828/3209828-hd_1280_720_25fps.mp4";
+
 const App: React.FC = () => {
   const [movies, setMovies] = useState<Movie[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -80,7 +83,7 @@ const App: React.FC = () => {
         </div>
       </main>
       <Footer />
-      {playingMovie && <MoviePlayerModal movie={playingMovie} onClose={handleClosePlayer} />}
+      {playingMovie && <MoviePlayerModal movie={playingMovie} trailerUrl={TRAILER_URL} onClose={handleClosePlayer} />}
       {unlockingMovie && <UnlockPremiumModal movie={unlockingMovie} onUnlockSuccess={handleUnlockSuccess} onClose={handleCloseUnlockModal} />}
     </div>
   );
