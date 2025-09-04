@@ -26,7 +26,7 @@ const movieSchema = {
 };
 
 
-export const generateMoviePortfolio = async (theme: string): Promise<Movie[]> => {
+export const generateMovieData = async (theme: string): Promise<Omit<Movie, 'poster'>[]> => {
   let retries = 3;
   let delay = 1000;
 
@@ -44,7 +44,7 @@ export const generateMoviePortfolio = async (theme: string): Promise<Movie[]> =>
       });
 
       const responseText = response.text.trim();
-      const parsedMovies = JSON.parse(responseText) as Omit<Movie, 'isPremium'>[];
+      const parsedMovies = JSON.parse(responseText) as Omit<Movie, 'isPremium' | 'poster'>[];
       
       const moviesWithPremium = parsedMovies.map(movie => ({ ...movie, isPremium: false }));
       if (moviesWithPremium.length > 0) {
@@ -66,6 +66,43 @@ export const generateMoviePortfolio = async (theme: string): Promise<Movie[]> =>
   }
   // This line is unreachable but required for TypeScript's control flow analysis.
   throw new Error("Failed to fetch movie portfolio from Gemini API.");
+};
+
+export const generateMoviePoster = async (title: string, synopsis: string): Promise<string> => {
+  let retries = 3;
+  let delay = 1000;
+
+  while (retries > 0) {
+    try {
+      const prompt = `Create a visually stunning, high-quality movie poster for a film titled "${title}". The movie's synopsis is: "${synopsis}". The poster should be dramatic and cinematic, in a photorealistic or epic digital painting style. The image must not contain any text, titles, logos, or credits. Focus on a single, powerful central image that captures the essence of the story.`;
+      
+      const response = await ai.models.generateImages({
+          model: 'imagen-4.0-generate-001',
+          prompt: prompt,
+          config: {
+            numberOfImages: 1,
+            outputMimeType: 'image/png',
+            aspectRatio: '3:4',
+          },
+      });
+
+      if (response.generatedImages && response.generatedImages.length > 0) {
+        return `data:image/png;base64,${response.generatedImages[0].image.imageBytes}`;
+      } else {
+        throw new Error("Image generation failed to return an image.");
+      }
+    } catch (error) {
+      retries--;
+      if (retries === 0) {
+        console.error(`Error generating poster for "${title}" after multiple retries:`, error);
+        throw new Error("Failed to generate movie poster.");
+      }
+      console.log(`API call for poster "${title}" failed. Retrying in ${delay / 1000}s...`);
+      await new Promise(res => setTimeout(res, delay));
+      delay *= 2;
+    }
+  }
+  throw new Error("Failed to generate movie poster.");
 };
 
 export const generateAccessKeyImage = async (title: string, synopsis: string): Promise<string> => {

@@ -15,7 +15,7 @@ import { WelcomeMessage } from './components/WelcomeMessage';
 import { MoviePlayerModal } from './components/MoviePlayerModal';
 import { UnlockPremiumModal } from './components/UnlockPremiumModal';
 import type { Movie } from './types';
-import { generateMoviePortfolio } from './services/geminiService';
+import { generateMovieData, generateMoviePoster } from './services/geminiService';
 import { SaveIcon } from './components/icons/SaveIcon';
 import { LoadIcon } from './components/icons/LoadIcon';
 import { ThemeButtons } from './components/ThemeButtons';
@@ -34,7 +34,8 @@ const isValidMovieArray = (data: any): data is Movie[] => {
         'title' in item && typeof item.title === 'string' &&
         'year' in item && typeof item.year === 'number' &&
         'synopsis' in item && typeof item.synopsis === 'string' &&
-        'isPremium' in item && typeof item.isPremium === 'boolean'
+        'isPremium' in item && typeof item.isPremium === 'boolean' &&
+        (!('poster' in item) || typeof item.poster === 'string' || item.poster === undefined)
     )
   );
 };
@@ -116,6 +117,24 @@ const App: React.FC = () => {
     setSearchQuery(theme);
   };
 
+  const fetchPosters = useCallback(async (moviesData: Movie[]) => {
+    moviesData.forEach(async (movie) => {
+      try {
+        const posterUrl = await generateMoviePoster(movie.title, movie.synopsis);
+        setMovies((currentMovies) =>
+          currentMovies.map((m) =>
+            m.title === movie.title && m.synopsis === movie.synopsis
+              ? { ...m, poster: posterUrl }
+              : m
+          )
+        );
+      } catch (err) {
+        console.error(`Failed to fetch poster for ${movie.title}:`, err);
+        // If poster generation fails, the placeholder will remain.
+      }
+    });
+  }, []);
+
   const handleSearch = useCallback(async () => {
     if (!searchQuery.trim()) {
       setError("Please enter a theme to generate movies.");
@@ -126,15 +145,16 @@ const App: React.FC = () => {
     setMovies([]);
 
     try {
-      const generatedMovies = await generateMoviePortfolio(searchQuery);
-      setMovies(generatedMovies);
+      const generatedMoviesData = await generateMovieData(searchQuery);
+      setMovies(generatedMoviesData);
+      fetchPosters(generatedMoviesData); // Start fetching posters after text data is set
     } catch (err) {
-      console.error("Error generating movie portfolio:", err);
+      console.error("Error generating movie data:", err);
       setError("Failed to generate movies. The request may have been blocked. Please try a different theme.");
     } finally {
       setIsLoading(false);
     }
-  }, [searchQuery]);
+  }, [searchQuery, fetchPosters]);
   
   const handleSavePortfolio = useCallback(() => {
     if (movies.length === 0) {

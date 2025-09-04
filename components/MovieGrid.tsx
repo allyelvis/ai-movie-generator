@@ -55,6 +55,13 @@ export const MovieGrid: React.FC<MovieGridProps> = ({ movies, onPlayTrailer }) =
           .animate-fade-in-slow {
             animation: fade-in-slow 1s ease-out forwards;
           }
+          @keyframes fade-in {
+            from { opacity: 0; }
+            to { opacity: 1; }
+          }
+          .animate-fade-in {
+            animation: fade-in 0.5s ease-in-out forwards;
+          }
         `}</style>
     </>
   );

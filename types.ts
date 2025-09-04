@@ -4,4 +4,5 @@ export interface Movie {
   year: number;
   synopsis: string;
   isPremium: boolean;
+  poster?: string;
 }
