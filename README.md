@@ -1,11 +1,12 @@
-# AI Movie Portfolio Generator
+# aenzbi - AI Movie Portfolio Generator
 
-An AI-powered application that generates a portfolio of fictional movies based on user-provided themes, styled with a high-tech, NVIDIA-inspired aesthetic. Enter a theme, genre, or concept, and let AI create a unique movie collection for you.
+An AI-powered application by aenzbi that generates a portfolio of fictional movies based on user-provided themes, styled with a high-tech, NVIDIA-inspired aesthetic. Enter a theme, genre, or concept, and let AI create a unique movie collection for you.
 
 ## Features
 
 -   **AI-Powered Movie Generation:** Leverages the Google Gemini API to generate a curated list of fictional movies, complete with titles, release years, and compelling synopses.
 -   **Dynamic Portfolio:** Enter any theme (e.g., "cyberpunk noir," "steampunk fantasy," "underwater westerns") to get a unique set of 6 movies.
+-   **Wallet Integration:** Connect your Ethereum wallet (e.g., MetaMask) to the application for a more immersive, Web3-inspired experience.
 -   **Interactive UI:** Browse the generated movie cards and "watch" a placeholder trailer for each film.
 -   **Responsive Design:** A sleek, modern interface that works seamlessly across desktop and mobile devices.
 -   **High-Tech Aesthetic:** Inspired by NVIDIA's design language, featuring glowing green accents, futuristic fonts, and a dark, immersive theme.
@@ -16,12 +17,13 @@ An AI-powered application that generates a portfolio of fictional movies based o
 -   **AI Model:** Google Gemini (`gemini-2.5-flash`) via the `@google/genai` SDK
 -   **Styling:** Tailwind CSS
 -   **Fonts:** Orbitron, Share Tech Mono (from Google Fonts)
+-   **Web3:** Interacts with browser wallet extensions via `window.ethereum`.
 
 ## Getting Started
 
 ### Prerequisites
 
--   A modern web browser.
+-   A modern web browser with a wallet extension like MetaMask.
 -   A valid Google Gemini API key.
 
 ### Running the Application
@@ -55,6 +57,7 @@ An AI-powered application that generates a portfolio of fictional movies based o
 │   ├── MovieGrid.tsx
 │   ├── MoviePlayerModal.tsx
 │   ├── SearchBar.tsx
+│   ├── WalletConnectButton.tsx
 │   └── WelcomeMessage.tsx
 ├── services/             # Services for external APIs
 │   └── geminiService.ts  # Logic for interacting with the Gemini API

@@ -31,6 +31,10 @@ export const UnlockPremiumModal: React.FC<UnlockPremiumModalProps> = ({ movie, o
   const handleGenerateKey = async () => {
     setIsLoading(true);
     setError(null);
+    // Clear previous image when regenerating
+    if (accessKeyImage) {
+        setAccessKeyImage(null);
+    }
     try {
       const imageBytes = await generateAccessKeyImage(movie.title, movie.synopsis);
       setAccessKeyImage(`data:image/png;base64,${imageBytes}`);
@@ -68,28 +72,28 @@ export const UnlockPremiumModal: React.FC<UnlockPremiumModalProps> = ({ movie, o
         <div className="p-6 text-center">
           {error && <div className="text-red-400 bg-red-900/50 p-3 rounded-md border border-red-700 mb-4">{error}</div>}
 
-          {!accessKeyImage && !isLoading && (
-            <>
+          {!accessKeyImage ? (
+             <>
               <p className="text-gray-300 mb-6">To access the trailer, you must generate a unique Digital Access Key.</p>
               <button
                 onClick={handleGenerateKey}
-                className="w-full flex items-center justify-center gap-3 font-bold font-orbitron py-3 px-4 rounded-md transition-all duration-300 bg-yellow-500/10 border border-yellow-500 text-yellow-400 hover:bg-yellow-500 hover:text-black"
+                disabled={isLoading}
+                className="w-full flex items-center justify-center gap-3 font-bold font-orbitron py-3 px-4 rounded-md transition-all duration-300 bg-yellow-500/10 border border-yellow-500 text-yellow-400 hover:bg-yellow-500 hover:text-black disabled:bg-gray-700/50 disabled:border-gray-600 disabled:text-gray-400 disabled:cursor-not-allowed"
               >
-                <KeyIcon className="w-5 h-5" />
-                Generate Access Key
+                {isLoading ? (
+                    <>
+                        <RefreshIcon className="w-5 h-5 animate-spin" />
+                        Generating...
+                    </>
+                ) : (
+                    <>
+                        <KeyIcon className="w-5 h-5" />
+                        Generate Access Key
+                    </>
+                )}
               </button>
             </>
-          )}
-
-          {isLoading && (
-            <div className="flex flex-col items-center justify-center p-8">
-                <div className="w-12 h-12 border-4 border-yellow-400 border-t-transparent border-solid rounded-full animate-spin"></div>
-                <p className="mt-4 text-lg text-yellow-300 font-orbitron tracking-wider">Generating Cryptographic Key...</p>
-                <p className="text-sm text-gray-400">AI is creating your secure token.</p>
-            </div>
-          )}
-
-          {accessKeyImage && !isLoading && (
+          ) : (
             <div className="animate-fade-in-slow">
               <p className="text-green-400 font-bold mb-2 font-orbitron">Digital Access Key Generated</p>
               <img src={accessKeyImage} alt="AI-generated Digital Access Key" className="w-full h-auto object-contain rounded-md border-2 border-green-500/50 mb-6" />
@@ -103,7 +107,8 @@ export const UnlockPremiumModal: React.FC<UnlockPremiumModalProps> = ({ movie, o
                 </button>
                  <button
                     onClick={handleGenerateKey}
-                    className="w-full sm:w-auto flex items-center justify-center gap-2 font-bold font-orbitron py-3 px-4 rounded-md transition-all duration-300 bg-gray-700/50 border border-gray-600 text-gray-300 hover:bg-gray-600 hover:text-white"
+                    disabled={isLoading}
+                    className="w-full sm:w-auto flex items-center justify-center gap-2 font-bold font-orbitron py-3 px-4 rounded-md transition-all duration-300 bg-gray-700/50 border border-gray-600 text-gray-300 hover:bg-gray-600 hover:text-white disabled:opacity-50"
                     title="Regenerate Access Key"
                     >
                     <RefreshIcon className="w-5 h-5" />
