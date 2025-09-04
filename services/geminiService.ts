@@ -1,4 +1,3 @@
-
 import { GoogleGenAI, Type } from "@google/genai";
 import type { Movie } from "../types";
 
@@ -41,11 +40,44 @@ export const generateMoviePortfolio = async (theme: string): Promise<Movie[]> =>
     });
 
     const responseText = response.text.trim();
-    const parsedMovies = JSON.parse(responseText) as Movie[];
-    return parsedMovies;
+    const parsedMovies = JSON.parse(responseText) as Omit<Movie, 'isPremium'>[];
+    
+    const moviesWithPremium = parsedMovies.map(movie => ({ ...movie, isPremium: false }));
+    if (moviesWithPremium.length > 0) {
+        // Randomly assign one movie as premium
+        const premiumIndex = Math.floor(Math.random() * moviesWithPremium.length);
+        moviesWithPremium[premiumIndex].isPremium = true;
+    }
+
+    return moviesWithPremium;
     
   } catch (error) {
     console.error("Error calling Gemini API:", error);
     throw new Error("Failed to fetch movie portfolio from Gemini API.");
+  }
+};
+
+export const generateAccessKeyImage = async (title: string, synopsis: string): Promise<string> => {
+  try {
+    const prompt = `Create a visually striking digital access key for a movie called '${title}'. The key should look like a high-tech, cryptographic certificate on a futuristic interface. Incorporate glowing neon green circuit patterns, holographic elements, and a sleek, dark background. The movie's theme is: '${synopsis}'. The image should be symbolic and abstract, and must not contain any readable text.`;
+    
+    const response = await ai.models.generateImages({
+        model: 'imagen-4.0-generate-001',
+        prompt: prompt,
+        config: {
+          numberOfImages: 1,
+          outputMimeType: 'image/png',
+          aspectRatio: '16:9',
+        },
+    });
+
+    if (response.generatedImages && response.generatedImages.length > 0) {
+      return response.generatedImages[0].image.imageBytes;
+    } else {
+      throw new Error("Image generation failed to return an image.");
+    }
+  } catch (error) {
+    console.error("Error generating access key image with Imagen API:", error);
+    throw new Error("Failed to generate access key image.");
   }
 };

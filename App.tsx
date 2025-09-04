@@ -1,4 +1,3 @@
-
 import React, { useState, useCallback } from 'react';
 import { Header } from './components/Header';
 import { SearchBar } from './components/SearchBar';
@@ -7,6 +6,7 @@ import { LoadingSpinner } from './components/LoadingSpinner';
 import { Footer } from './components/Footer';
 import { WelcomeMessage } from './components/WelcomeMessage';
 import { MoviePlayerModal } from './components/MoviePlayerModal';
+import { UnlockPremiumModal } from './components/UnlockPremiumModal';
 import type { Movie } from './types';
 import { generateMoviePortfolio } from './services/geminiService';
 
@@ -15,6 +15,7 @@ const App: React.FC = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [playingMovie, setPlayingMovie] = useState<Movie | null>(null);
+  const [unlockingMovie, setUnlockingMovie] = useState<Movie | null>(null);
 
   const handleSearch = useCallback(async (theme: string) => {
     if (!theme.trim()) {
@@ -37,12 +38,28 @@ const App: React.FC = () => {
   }, []);
 
   const handlePlayTrailer = (movie: Movie) => {
-    setPlayingMovie(movie);
+    if (movie.isPremium) {
+        setUnlockingMovie(movie);
+    } else {
+        setPlayingMovie(movie);
+    }
   };
 
   const handleClosePlayer = () => {
     setPlayingMovie(null);
   };
+
+  const handleUnlockSuccess = () => {
+    if (unlockingMovie) {
+        setPlayingMovie(unlockingMovie);
+        setUnlockingMovie(null);
+    }
+  };
+
+  const handleCloseUnlockModal = () => {
+    setUnlockingMovie(null);
+  };
+
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-950 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(52,211,153,0.15),rgba(255,255,255,0))]">
@@ -64,6 +81,7 @@ const App: React.FC = () => {
       </main>
       <Footer />
       {playingMovie && <MoviePlayerModal movie={playingMovie} onClose={handleClosePlayer} />}
+      {unlockingMovie && <UnlockPremiumModal movie={unlockingMovie} onUnlockSuccess={handleUnlockSuccess} onClose={handleCloseUnlockModal} />}
     </div>
   );
 };
